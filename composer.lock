@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e77500cbe38dd02197c7753fd64023c",
+    "content-hash": "1d017ab3fdd5ac05789dbe0a2f63e12a",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1226,6 +1226,198 @@
                 "source": "https://github.com/inertiajs/inertia-laravel/tree/v2.0.18"
             },
             "time": "2025-12-31T16:10:57+00:00"
+        },
+        {
+            "name": "jobmetric/laravel-event-system",
+            "version": "2.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jobmetric/laravel-event-system.git",
+                "reference": "a331f3aa1c1b2d320a1113204428f385f164faac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jobmetric/laravel-event-system/zipball/a331f3aa1c1b2d320a1113204428f385f164faac",
+                "reference": "a331f3aa1c1b2d320a1113204428f385f164faac",
+                "shasum": ""
+            },
+            "require": {
+                "jobmetric/laravel-package-core": "^1.33",
+                "laravel/framework": ">=9.19",
+                "php": ">=8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "EventSystem": "JobMetric\\EventSystem\\Facades\\EventSystem"
+                    },
+                    "providers": [
+                        "JobMetric\\EventSystem\\EventSystemServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "JobMetric\\EventSystem\\": "src/",
+                    "JobMetric\\EventSystem\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Majid Mohammadian",
+                    "email": "majeedmohammadian@gmail.com",
+                    "homepage": "https://www.linkedin.com/in/majidmohammadian/",
+                    "role": "Full Stack Developer"
+                }
+            ],
+            "description": "This is a event system management package for Laravel that you can use in your projects.",
+            "homepage": "https://doc.jobmetric.net/package/laravel-event-system",
+            "keywords": [
+                "event",
+                "event-manager",
+                "jobmetric",
+                "laravel",
+                "management",
+                "package"
+            ],
+            "support": {
+                "forum": "https://twitter.com/jobmetric",
+                "issues": "https://github.com/jobmetric/laravel-event-system/issues",
+                "source": "https://github.com/jobmetric/laravel-event-system"
+            },
+            "time": "2025-12-30T17:45:12+00:00"
+        },
+        {
+            "name": "jobmetric/laravel-package-core",
+            "version": "1.34.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jobmetric/laravel-package-core.git",
+                "reference": "1339ce9e56bb4d1ff501469ed497af251d7c536a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jobmetric/laravel-package-core/zipball/1339ce9e56bb4d1ff501469ed497af251d7c536a",
+                "reference": "1339ce9e56bb4d1ff501469ed497af251d7c536a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "laravel/framework": ">=9.19",
+                "php": ">=8.0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "JobMetric\\PackageCore\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Majid Mohammadian",
+                    "email": "majeedmohammadian@gmail.com",
+                    "homepage": "https://www.linkedin.com/in/majidmohammadian/",
+                    "role": "Full Stack Developer"
+                }
+            ],
+            "description": "It is a standard package of different components of Laravel that helps you write different packages better and more fluently",
+            "homepage": "https://doc.jobmetric.net/package/laravel-package-core",
+            "keywords": [
+                "core",
+                "jobmetric",
+                "laravel",
+                "package",
+                "tools"
+            ],
+            "support": {
+                "forum": "https://twitter.com/jobmetric",
+                "issues": "https://github.com/jobmetric/laravel-package-core/issues",
+                "source": "https://github.com/jobmetric/laravel-package-core"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/majidmohammadian",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-12-24T12:42:44+00:00"
+        },
+        {
+            "name": "jobmetric/laravel-star",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jobmetric/laravel-star.git",
+                "reference": "c70cd2d7338c80d0cabd3376523982cf2e45c68f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jobmetric/laravel-star/zipball/c70cd2d7338c80d0cabd3376523982cf2e45c68f",
+                "reference": "c70cd2d7338c80d0cabd3376523982cf2e45c68f",
+                "shasum": ""
+            },
+            "require": {
+                "jobmetric/laravel-event-system": "^2.7",
+                "jobmetric/laravel-package-core": "^1.7",
+                "laravel/framework": ">=9.19",
+                "php": ">=8.0.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JobMetric\\Star\\StarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JobMetric\\Star\\": "src/",
+                    "JobMetric\\Star\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Majid Mohammadian",
+                    "email": "majeedmohammadian@gmail.com",
+                    "homepage": "https://www.linkedin.com/in/majidmohammadian/",
+                    "role": "Full Stack Developer"
+                }
+            ],
+            "description": "This is a star rating management package for any object in Laravel that you can use in your projects.",
+            "homepage": "https://doc.jobmetric.net/package/laravel-star",
+            "keywords": [
+                "jobmetric",
+                "laravel",
+                "management",
+                "package",
+                "star"
+            ],
+            "support": {
+                "forum": "https://twitter.com/jobmetric",
+                "issues": "https://github.com/jobmetric/laravel-star/issues",
+                "source": "https://github.com/jobmetric/laravel-star"
+            },
+            "time": "2025-12-30T18:27:11+00:00"
         },
         {
             "name": "laravel/fortify",

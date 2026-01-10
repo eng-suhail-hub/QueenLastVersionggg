@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Models\Traits\HasPublicId;
+use JobMetric\Star\CanStar;
+
+
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable,HasPublicId,CanStar;
 
     /**
      * The attributes that are mass assignable.
@@ -19,10 +23,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+    'public_id',
         'name',
         'email',
         'password',
     ];
+       public function getRouteKeyName(): string
+    {
+        return 'public_id';
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -34,6 +43,7 @@ class User extends Authenticatable
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
+        'id',
     ];
 
     /**
@@ -49,4 +59,18 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+
+
+
+//         public function applications()
+//     {
+
+//     }
+
+//     public function likedPosts()
+// {
+//     return $this->belongsToMany(UniversityPost::class, 'post_likes', 'user_id', 'university_posts_id')
+//         ->withTimestamps();
+// }
 }
