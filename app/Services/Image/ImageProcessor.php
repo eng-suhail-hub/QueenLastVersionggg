@@ -8,8 +8,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Interfaces\ImageInterface;
 use Intervention\Image\Exceptions\NotSupportedException;
-use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
-
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 
 class ImageProcessor
@@ -151,7 +150,7 @@ class ImageProcessor
         }
 
         try {
-            ImageOptimizer::optimize($absolutePath);
+            OptimizerChainFactory::create()->optimize($absolutePath);
         } catch (\Throwable $e) {
             // Ignore optimizer failures in environments without optimization binaries
             report($e);

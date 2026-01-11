@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Arr;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\University>
@@ -16,8 +18,10 @@ class UniversityFactory extends Factory
      */
     public function definition(): array
     {
+        $image = self::randomProcessedImage();
+        $background = self::randomProcessedImage();
+
         return [
-            'public_id' => $this->faker->unique()->uuid(),
             'name' => $this->faker->company(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => bcrypt('password'), // Default password
@@ -28,6 +32,22 @@ class UniversityFactory extends Factory
             'type' => $this->faker->randomElement(['public', 'private']),
             'location' => $this->faker->address(),
             'has_email_authentication' => false,
+            'image_path' => $image,
+            'image_background' => $background,
         ];
+    }
+
+    protected static function randomProcessedImage(): ?string
+    {
+        static $images = null;
+        if ($images === null) {
+            $all = Storage::disk('public')->files('universities');
+            $images = array_values(array_filter($all, function ($p) {
+                $ext = strtolower(pathinfo($p, PATHINFO_EXTENSION));
+                return in_array($ext, ['webp']);
+            }));
+        }
+
+        return !empty($images) ? Arr::random($images) : null;
     }
 }
