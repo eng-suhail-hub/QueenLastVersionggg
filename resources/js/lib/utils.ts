@@ -9,3 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+// import { clsx, type ClassValue } from "clsx"
+// import { twMerge } from "tailwind-merge"
+
+// export function cn(...inputs: ClassValue[]) {
+//   return twMerge(clsx(inputs))
+// }
+

@@ -12,11 +12,46 @@ use App\Http\Controllers\Rate\UniversityRatingController;
 
 
 
+// Route::get('/', function () {
+//     return Inertia::render('welcome', [
+//         'canRegister' => Features::enabled(Features::registration()),
+//     ]);
+// })->name('home');
+
+
+
+
 Route::get('/', function () {
-    return Inertia::render('welcome', [
+    return Inertia::render('Home', [
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);})->name('home');
+
+
+
+Route::get('/universities', function () {
+    return Inertia::render('Universities', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
-})->name('home');
+})->name('/universities');
+
+
+Route::get('/colleges', function () {
+    return Inertia::render('Colleges', [
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);
+})->name('colleges');
+
+Route::get('/articles', function () {
+    return Inertia::render('Articles', [
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);
+})->name('articles');
+
+Route::get('/guidance', function () {
+    return Inertia::render('Guidance', [
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);
+})->name('guidance');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -28,3 +63,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+// Allow GET requests to Boost browser logs endpoint to avoid MethodNotAllowed
+// The vendor package registers POST at the same path; this GET handler prevents accidental GET errors.
+// Route::get('/_boost/browser-logs', function () {
+//     return response()->json(['status' => 'ok']);
+// });
