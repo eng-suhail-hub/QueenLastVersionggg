@@ -21,7 +21,7 @@ $all = Storage::disk($disk)->files($sourceDir);
 
 $images = array_values(array_filter($all, function ($p) {
     $ext = strtolower(pathinfo($p, PATHINFO_EXTENSION));
-    return in_array($ext, ['jpg','jpeg','png','webp','gif']);
+    return in_array($ext, ['jpg','jpeg','png','webp','gif','heic']);
 }));
 
 if (empty($images)) {

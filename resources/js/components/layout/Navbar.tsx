@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link } from "@inertiajs/react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Moon, Sun, Globe, Menu, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useState, useEffect } from "react";
 export function Navbar() {
   const { language, setLanguage, t } = useLanguage();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [location] = useLocation();
+  const [location] = window.location.pathname;
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -76,7 +76,7 @@ export function Navbar() {
           <Button className="hidden md:flex bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold">
             {t('apply')}
           </Button>
-          
+
           {/* Mobile Menu Trigger - Simplified for Mockup */}
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-6 w-6" />

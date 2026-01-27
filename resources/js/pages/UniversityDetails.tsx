@@ -386,12 +386,8 @@ export default function UniversityDetails() {
                              <TableRow key={major.id}>
                                <TableCell className="font-medium">
                                  <div className="font-bold">{major.name}</div>
-                                 <div className="text-xs text-muted-foreground mt-1 max-w-[300px]">
-                                   {major.description
-                                     ? (major.description.length > 140
-                                         ? `${major.description.slice(0, 140)}...`
-                                         : major.description)
-                                     : ''}
+                                 <div className="text-xs text-muted-foreground mt-1 max-w-[300px] line-clamp-2">
+                                   {major.description || ''}
                                  </div>
                                </TableCell>
                                <TableCell>

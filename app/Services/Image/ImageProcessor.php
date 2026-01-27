@@ -44,9 +44,7 @@ class ImageProcessor
     {
         try {
             /** @var ImageInterface $image */
-            $image = $this->ensureSrgb(
-                Image::read($file->getRealPath())->orient()
-            );
+            $image = $this->ensureSrgb($this->readImage($file));
 
             return (string) $this->downscale($image, $width, $height)
                 ->toWebp(quality: $quality);
@@ -54,13 +52,26 @@ class ImageProcessor
             report($e);
 
             /** @var ImageInterface $fallback */
-            $fallback = $this->ensureSrgb(
-                Image::read($file->getRealPath())->orient()
-            );
+            $fallback = $this->ensureSrgb($this->readImage($file));
 
             return (string) $this->downscale($fallback, $width, $height)
                 ->toJpeg(quality: $quality);
         }
+    }
+
+    /**
+     * Read the uploaded image contents defensively so Livewire temp files decode reliably.
+     */
+    protected function readImage(UploadedFile $file): ImageInterface
+    {
+        $path = $file->getRealPath() ?: $file->getPathname();
+        $contents = $path && is_readable($path) ? @file_get_contents($path) : false;
+
+        if ($contents === false || $contents === '') {
+            throw new \RuntimeException('Unable to read uploaded image contents');
+        }
+
+        return Image::read($contents)->orient();
     }
 
     /**
