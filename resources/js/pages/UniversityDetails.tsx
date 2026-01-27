@@ -1,10 +1,10 @@
 import { Link, usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { router } from '@inertiajs/react';
+
 import { Layout } from "@/components/layout/Layout";
 import AppLayout from "@/layouts/AppLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { universities, colleges, majors, articles } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, Star, GraduationCap, Clock, DollarSign, BookOpen, ArrowLeft, Heart, ArrowRight, CheckCircle2 } from "lucide-react";
@@ -29,14 +29,63 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-export default function UniversityDetails() {
-  const { props } = usePage();
-  const { t, language } = useLanguage();
+type UniversityImage = {
+  public_id: string;
+  path_main: string | null;
+  path_thumb: string | null;
+  priority: number | null;
+  is_active: boolean;
+};
 
-  // استقبال البيانات القادمة من Laravel Controller
-  // إذا كانت البيانات موجودة في props.universityData سنستخدمها، وإلا سنبحث في mockData (للمعاينة)
-  const id = props.id as string;
-  const universityFromLaravel = props.universityData as any;
+type UniversityMajor = {
+  public_id: string;
+  number_of_seats: number | null;
+  admission_rate: number | null;
+  study_years: number | null;
+  tuition_fee: number | null;
+  published: boolean;
+  major: {
+    public_id: string;
+    name: string | null;
+    description: string | null;
+    designation_jobs: string | null;
+    study_years: number | null;
+    college: {
+      public_id: string;
+      name: string | null;
+      description: string | null;
+      image_path: string | null;
+    };
+  };
+};
+
+type UniversityData = {
+  public_id: string;
+  name: string | null;
+  email: string | null;
+  description: string | null;
+  location: string | null;
+  address: string | null;
+  phone: string | null;
+  type: string | null;
+  status: string | null;
+  image_path: string | null;
+  image_background: string | null;
+  avatar_url: string | null;
+  rating?: number | null;
+  fees?: number | null;
+  images?: UniversityImage[];
+  universityMajors?: UniversityMajor[];
+};
+
+type PageProps = {
+  public_id?: string;
+  universityData?: UniversityData;
+};
+
+export default function UniversityDetails() {
+  const { t, language } = useLanguage();
+  const {universityData } = usePage<PageProps>().props;
 
   const [likedArticles, setLikedArticles] = useState<Set<string>>(new Set());
   const [userRating, setUserRating] = useState(0);
@@ -44,7 +93,40 @@ export default function UniversityDetails() {
   const [isRated, setIsRated] = useState(false);
   const [currentUniRating, setCurrentUniRating] = useState<number | null>(null);
 
-  const uni = universityFromLaravel || universities.find(u => u.id === id);
+  const uni = universityData ?? null;
+  const { universityMajors = [] } = uni ?? {};
+
+  const groupedColleges = useMemo(() => {
+    if (!universityMajors || universityMajors.length === 0) return [] as Array<{ id: string; name: string; description: string | null; image: string | null; majors: any[] }>;
+
+    const map = new Map<string, { id: string; name: string; description: string | null; image: string | null; majors: any[] }>();
+
+    universityMajors.forEach((um) => {
+      const college = um.major.college;
+      const collegeId = college.public_id;
+
+      if (!map.has(collegeId)) {
+        map.set(collegeId, {
+          id: collegeId,
+          name: college.name ?? "",
+          description: college.description,
+          image: college.image_path,
+          majors: [],
+        });
+      }
+
+      map.get(collegeId)?.majors.push({
+        id: um.major.public_id,
+        name: um.major.name,
+        description: um.major.description,
+        years: um.study_years ?? um.major.study_years,
+        gpa: um.admission_rate,
+        fees: um.tuition_fee,
+      });
+    });
+
+    return Array.from(map.values());
+  }, [universityMajors]);
 
   if (!uni) return <AppLayout><NotFound /></AppLayout>;
 
@@ -52,13 +134,13 @@ export default function UniversityDetails() {
     const isEditing = isRated;
 
     // إرسال التقييم إلى Laravel عبر Inertia
-    router.post(`/universities/${id}/rate`, { rating }, {
+    router.post(`/universities/${uni.public_id}/rate`, { rating }, {
       onSuccess: () => {
         setUserRating(rating);
         setIsRated(true);
 
         if (uni) {
-          const baseRating = currentUniRating || uni.rating;
+          const baseRating = currentUniRating ?? uni.rating ?? 0;
           const newRating = isEditing
             ? Number((baseRating + (rating - userRating) * 0.1).toFixed(1))
             : Number(((baseRating * 10 + rating) / 11).toFixed(1));
@@ -94,9 +176,9 @@ export default function UniversityDetails() {
     });
   };
 
-  // Filter articles specific to this university
-  const universityArticles = articles.filter(a => a.universityId === uni.id);
-  const uniColleges = colleges;
+  // Articles placeholder until backend provides them for a university
+  const universityArticles: any[] = [];
+  const uniColleges = groupedColleges;
 
   return (
     <AppLayout>
@@ -104,15 +186,15 @@ export default function UniversityDetails() {
         {/* Hero Header */}
         <div className="relative h-[300px] md:h-[400px] bg-muted overflow-hidden">
           <img
-            src={uni.image}
-            alt={uni.name}
+            src={uni.image_background ?? uni.image_path ?? "https://via.placeholder.com/1200x500"}
+            alt={uni.name ?? "University"}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 container mx-auto pb-8 px-4 md:px-0">
             <div className="flex items-end gap-6 mb-6">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-background overflow-hidden bg-white shadow-xl flex-shrink-0">
-                <img src={uni.logo} alt="Logo" className="w-full h-full object-contain p-2" />
+                <img src={uni.avatar_url ?? "https://via.placeholder.com/200"} alt="Logo" className="w-full h-full object-contain p-2" />
               </div>
               <div className="flex-1 pb-2">
                 <Link href="/universities">
@@ -129,12 +211,12 @@ export default function UniversityDetails() {
               <div className="flex flex-wrap items-center gap-4 text-foreground/80">
                 <div className="flex items-center gap-1 text-sm md:text-base">
                   <MapPin className="h-4 w-4" />
-                  <span>{language === 'ar' ? uni.locationAr : uni.location}</span>
+                  <span>{uni.location}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1 text-sm md:text-base">
                     <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                    <span>{currentUniRating || uni.rating} / 5.0</span>
+                    <span>{currentUniRating ?? uni.rating ?? '-'} </span>
                   </div>
 
                   <div className="flex flex-col gap-1 w-full sm:w-auto">
@@ -211,7 +293,7 @@ export default function UniversityDetails() {
                   <section>
                     <h2 className="text-2xl font-bold mb-4">{language === 'ar' ? 'عن الجامعة' : 'About University'}</h2>
                     <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                      {language === 'ar' ? uni.descriptionAr : uni.description}
+                      {uni.description}
                     </p>
                   </section>
 
@@ -233,7 +315,7 @@ export default function UniversityDetails() {
                         }}
                       >
                         <div className="min-w-[300px] md:min-w-[400px] aspect-video bg-muted rounded-lg overflow-hidden border">
-                          <img src={uni.image} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+                          <img src={uni.image_path ?? uni.image_background ?? "https://via.placeholder.com/800x450"} className="w-full h-full object-cover hover:scale-105 transition-transform" />
                         </div>
                         <div className="min-w-[300px] md:min-w-[400px] aspect-video bg-muted rounded-lg overflow-hidden border">
                           <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&auto=format&fit=crop&q=60" className="w-full h-full object-cover hover:scale-105 transition-transform" />
@@ -255,7 +337,13 @@ export default function UniversityDetails() {
                        <div className="space-y-3">
                          <div className="flex justify-between items-center py-2 border-b border-dashed">
                            <span className="text-muted-foreground flex items-center gap-2 text-sm"><DollarSign className="h-4 w-4"/> {language === 'ar' ? 'الرسوم' : 'Tuition'}</span>
-                           <span className="font-medium text-sm">{uni.fees === 0 ? (language === 'ar' ? 'مجاني' : 'Free') : `${uni.fees} SAR`}</span>
+                           <span className="font-medium text-sm">
+                             {typeof uni.fees === 'number'
+                               ? uni.fees === 0
+                                 ? (language === 'ar' ? 'مجاني' : 'Free')
+                                 : `${uni.fees} SAR`
+                               : '—'}
+                           </span>
                          </div>
                          <div className="flex justify-between items-center py-2 border-b border-dashed">
                            <span className="text-muted-foreground flex items-center gap-2 text-sm"><GraduationCap className="h-4 w-4"/> {language === 'ar' ? 'تأسست' : 'Founded'}</span>
@@ -278,9 +366,9 @@ export default function UniversityDetails() {
                   <Card key={college.id} className="overflow-hidden border-primary/10">
                      <div className="bg-muted/30 p-4 border-b flex items-center gap-4">
                        <div className="h-10 w-10 md:h-12 md:w-12 rounded bg-white overflow-hidden border">
-                          <img src={college.image} className="h-full w-full object-cover" />
+                          <img src={college.image ?? "https://via.placeholder.com/120"} className="h-full w-full object-cover" />
                        </div>
-                       <h3 className="text-lg md:text-xl font-bold">{language === 'ar' ? college.nameAr : college.name}</h3>
+                       <h3 className="text-lg md:text-xl font-bold">{college.name}</h3>
                      </div>
                      <div className="overflow-x-auto">
                        <Table>
@@ -297,18 +385,24 @@ export default function UniversityDetails() {
                            {college.majors.map((major) => (
                              <TableRow key={major.id}>
                                <TableCell className="font-medium">
-                                 <div className="font-bold">{language === 'ar' ? major.nameAr : major.name}</div>
-                                 <div className="text-xs text-muted-foreground mt-1 max-w-[300px]">{language === 'ar' ? major.descriptionAr : major.description}</div>
+                                 <div className="font-bold">{major.name}</div>
+                                 <div className="text-xs text-muted-foreground mt-1 max-w-[300px]">
+                                   {major.description
+                                     ? (major.description.length > 140
+                                         ? `${major.description.slice(0, 140)}...`
+                                         : major.description)
+                                     : ''}
+                                 </div>
                                </TableCell>
                                <TableCell>
                                  <div className="flex items-center gap-1 text-xs md:text-sm">
                                    <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                                   {major.years} {language === 'ar' ? 'سنوات' : 'Years'}
+                                   {major.years ?? '-'} {language === 'ar' ? 'سنوات' : 'Years'}
                                  </div>
                                </TableCell>
-                               <TableCell className="text-xs md:text-sm">{major.gpa}</TableCell>
+                               <TableCell className="text-xs md:text-sm">{major.gpa ?? '-'}</TableCell>
                                <TableCell className="font-bold text-xs md:text-sm whitespace-nowrap">
-                                 {major.fees.toLocaleString()} SAR
+                                 {typeof major.fees === 'number' ? `${major.fees.toLocaleString()} SAR` : '—'}
                                </TableCell>
                                <TableCell className="text-right">
                                  <Link href={`/apply/${uni.id}?major=${major.id}`}>

@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import AppLayout from "@/layouts/AppLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { universities } from "@/lib/mockData";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import { Search, MapPin, Star, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
 import {
   Select,
   SelectContent,
@@ -18,17 +18,41 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 
+type University = {
+  public_id: string;
+  name: string | null;
+  description: string | null;
+  location: string | null;
+  address: string | null;
+  phone: string | null;
+  type: string | null;
+  status: string | null;
+  email: string | null;
+  image_path: string | null;
+  image_background: string | null;
+  avatar_url: string | null;
+  // Optional fields if the API provides them later
+  rating: number | null;
+  fees?: number;
+};
+
+type PageProps = {
+  universitiesData?: University[];
+};
+
 export default function Universities() {
   const { t, language } = useLanguage();
+  const { universitiesData = [] } = usePage<PageProps>().props;
   const [searchTerm, setSearchTerm] = useState("");
   const [minRating, setMinRating] = useState(0);
 
-  const filteredUniversities = universities.filter((uni) => {
-    const name = language === 'ar' ? uni.nameAr : uni.name;
-    const location = language === 'ar' ? uni.locationAr : uni.location;
-    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRating = uni.rating >= minRating;
+  const filteredUniversities = universitiesData.filter((uni) => {
+    const name = (language === "ar" ? uni.name : uni.name) ?? "";
+    const location = uni.location ?? "";
+    const matchesSearch =
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRating = typeof uni.rating === "number" ? uni.rating >= minRating : true;
     return matchesSearch && matchesRating;
   });
 
@@ -109,44 +133,54 @@ export default function Universities() {
               <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
                 {filteredUniversities.map((uni) => (
                   <motion.div
-                    key={uni.id}
+                    key={uni.public_id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     layout
                   >
-                    <Link href={`/universities/${uni.id}`}>
+                    <Link href={`/universities/${uni.public_id}`}>
                       <Card className="overflow-hidden hover:shadow-lg transition-all cursor-pointer h-full flex flex-col group">
                         <div className="aspect-video overflow-hidden relative">
                           <img
-                            src={uni.image}
-                            alt={uni.name}
+                            src={uni.image_background ?? uni.image_path ?? "https://via.placeholder.com/640x360"}
+                            alt={uni.name ?? "University"}
                             className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                           />
-                          <div className="absolute -bottom-6 left-4 rtl:left-auto rtl:right-4 z-10">
-                            <div className="w-16 h-16 rounded-full border-4 border-background overflow-hidden bg-white shadow-md">
-                              <img src={uni.logo} alt="Logo" className="w-full h-full object-contain p-1" />
+                          <div className="absolute -bottom-4 left-4 rtl:left-auto rtl:right-4 z-10">
+                            <div className="w-16 h-16 aspect-square rounded-full overflow-hidden shadow-md border-4 border-white">
+                              <img
+                                src={uni.avatar_url ?? "https://via.placeholder.com/120"}
+                                alt="Logo"
+                                className="w-full h-full object-cover rounded-full"
+                              />
                             </div>
                           </div>
                           <div className="absolute top-2 right-2 bg-background/90 backdrop-blur px-2 py-1 rounded text-xs font-bold flex items-center gap-1">
                             <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            {uni.rating}
+                            {uni.rating ?? "-"}
                           </div>
                         </div>
                         <CardHeader className="pt-8">
-                          <h3 className="text-xl font-bold">{language === 'ar' ? uni.nameAr : uni.name}</h3>
+                          <h3 className="text-xl font-bold">{uni.name}</h3>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <MapPin className="h-4 w-4" />
-                            {language === 'ar' ? uni.locationAr : uni.location}
+                            {uni.location}
                           </div>
                         </CardHeader>
                         <CardContent className="flex-1">
                           <p className="text-sm text-muted-foreground line-clamp-3">
-                            {language === 'ar' ? uni.descriptionAr : uni.description}
+                            {uni.description}
                           </p>
                         </CardContent>
                         <CardFooter className="border-t pt-4 flex justify-between items-center bg-muted/20">
                           <span className="font-bold text-primary">
-                            {uni.fees === 0 ? (language === 'ar' ? 'مجاني' : 'Free') : `${uni.fees.toLocaleString()} SAR`}
+                            {typeof uni.fees === "number"
+                              ? uni.fees === 0
+                                ? language === "ar"
+                                  ? "مجاني"
+                                  : "Free"
+                                : `${uni.fees.toLocaleString()} SAR`
+                              : "Free"}
                           </span>
                           <Button variant="ghost" size="sm" className="hover:bg-primary hover:text-white transition-colors">
                             {t('viewDetails')}

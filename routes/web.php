@@ -5,7 +5,7 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\PostLike\PostLikeController;
 use App\Http\Controllers\Rate\UniversityRatingController;
-
+use App\Http\Controllers\UniversityController;
 // use App\Http\Controllers\HomeController;
 
 // Route::get('/', HomeController::class)->name('home');
@@ -17,6 +17,7 @@ use App\Http\Controllers\Rate\UniversityRatingController;
 //         'canRegister' => Features::enabled(Features::registration()),
 //     ]);
 // })->name('home');
+        Route::get('/universities/{university}', [UniversityController::class, 'show']);
 
 
 
@@ -28,11 +29,8 @@ Route::get('/', function () {
 
 
 
-Route::get('/universities', function () {
-    return Inertia::render('Universities', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('/universities');
+// Use controller for listing universities
+Route::get('/universities', [UniversityController::class, 'index'])->name('universities');
 
 
 Route::get('/colleges', function () {
@@ -61,6 +59,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/universities/{university}/rate', [UniversityRatingController::class, 'store']);
     Route::post('/universityposts/{universitypost}/taggle-like', [PostLikeController::class, 'taggle']);
 });
+
+// (duplicate removed) controller index is defined above
 
 require __DIR__.'/settings.php';
 

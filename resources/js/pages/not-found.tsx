@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
-import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Link } from "@inertiajs/react";
 
 export default function NotFound() {
   return (
@@ -13,7 +13,7 @@ export default function NotFound() {
                <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
           </div>
-          
+
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">404</h1>
             <h2 className="text-xl font-semibold text-foreground/80">Page Not Found</h2>
@@ -23,11 +23,11 @@ export default function NotFound() {
             The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
           </p>
 
-          <Link href="/">
+            <Link href="/">
             <Button className="w-full font-bold">
               <Home className="mr-2 h-4 w-4" />
               Return Home
-            </Button>
+          </Button>
           </Link>
         </CardContent>
       </Card>
